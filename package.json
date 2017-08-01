@@ -1,0 +1,35 @@
+{
+  "name": "grey-publish",
+  "version": "0.1.0",
+  "description": "grey publish",
+  "main": "build/grey.js",
+  "scripts": {
+    "start": "BABEL_ENV=dev webpack-dashboard -- webpack-dev-server -w --open --env=dev",
+    "build": "BABEL_ENV=prod webpack --env=prod",
+    "test": "ava"
+  },
+  "author": "zenxds",
+  "publishConfig": {},
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "devDependencies": {
+    "ava": "^0.19.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^6.4.1",
+    "babel-preset-env": "^1.5.1",
+    "es3ify-loader": "^0.2.0",
+    "eslint": "^4.0.0",
+    "eslint-loader": "^1.8.0",
+    "eslint-plugin-import": "^2.3.0",
+    "html-webpack-plugin": "^2.28.0",
+    "moment": "^2.18.1",
+    "webpack": "^3.0.0",
+    "webpack-cleanup-plugin": "^0.5.1",
+    "webpack-dashboard": "^0.4.0",
+    "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+  }
+}

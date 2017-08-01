@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title></title>
+<script type="text/javascript" src="grey.js?a4324db7085493af0ace"></script></head>
+<body>
+  <script>
+    var protocol = location.protocol === 'file:' ? 'http:' : location.protocol
+    var stableKISSY = protocol + '//g.alicdn.com/kissy/k/1.4.0/seed-min.js'
+    var greyKISSY = protocol + '//g.alicdn.com/kissy/k/1.4.2/seed-min.js'
+
+    grey({
+      stable: stableKISSY,
+      grey: greyKISSY,
+      greyKey: 'key-grey',
+      stableKey: 'key-stable',
+      greyHash: '1.4.2',
+      stableHash: '1.4.0',
+      hash: function(code) {
+        console.log('hash', code)
+
+        return /v1\.40/.test(code) ? '1.4.0' : '1.4.2'
+      },
+
+      before: function(params) {
+        console.log('before', params)
+      },
+      after: function(params) {
+        console.log('after', params)
+      },
+
+      ratio: 50,
+      base: 100
+    })
+
+  </script>
+</body>
+</html>

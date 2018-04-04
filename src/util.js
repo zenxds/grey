@@ -22,7 +22,7 @@ export function extend(target, source) {
 
 export function curry(fn, params) {
   return function(params2) {
-    return fn.call(null, extend(params, params2 || {}))
+    return fn.call(null, extend(params2 || {}, params))
   }
 }
 

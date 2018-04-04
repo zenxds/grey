@@ -25,10 +25,10 @@ const grey = function(options) {
    * ratio: 灰度比例
    * base: 灰度基数
    *
-   * 保存在localStorage的key
-   * stableKey
-   * greyKey
-   *
+   * key: 保存在localStorage的key
+   * url: js地址
+   * hash: js哈希值
+   * 
    * 加载前后执行
    * before
    * after
@@ -38,45 +38,41 @@ const grey = function(options) {
   options = extend({
     before: noop,
     after: noop,
-    stable: '',
-    stableKey: '',
-    stableHash: '',
-    grey: '',
-    greyKey: '',
-    greyHash: '',
+    stable: {
+      url: '',
+      key: '',
+      hash: ''
+    },
+    grey: {
+      url: '',
+      key: '',
+      hash: ''
+    },
     hash: v => v,    
     base: 100,
     ratio: 1,
     timeout: 10000
   }, options)
 
-  let key
-  let url
-  let code
-  // hash key
-  let hash
-  // hash fn
-  const hashFn = options.hash
-  const params = {}
-
+  
+  let params
   if (options.ratio >= options.base || bingo(options.ratio, options.base)) {
-    key = options.greyKey
-    url = options.grey
-    hash = options.greyHash
-    params.type = 'grey'
+    params = extend({
+      type: 'grey'
+    }, options.grey)
   } else {
-    key = options.stableKey
-    url = options.stable
-    hash = options.stableHash
-    params.type = 'stable'
+    params = extend({
+      type: 'stable'
+    }, options.stable)
   }
 
-  params.url = url
-  params.key = key
-  params.hash = hash
+  let code  
+  let hashFn = options.hash
+  let after = curry(options.after, params)
+  let { key, url, hash } = params  
 
+  // before hook
   options.before(params)
-  options.after = curry(options.after, params)
 
   if (key && (CORS || XDomain) && isFunction(hashFn)) {
     try {
@@ -85,29 +81,29 @@ const grey = function(options) {
       // hash校验
       if (code && hash === hashFn(code, params)) {
         parseCode(code)
-        options.after({
+        after({
           from: 'local'
         })
       } else {
-        request(url, function (code) {
+        request(url, function(code) {
           localStorage.setItem(key, code)
           parseCode(code)
-          options.after({
+          after({
             from: 'cors'
           })
-        }, function (e) {
+        }, function() {
           // CORS超时或出错时使用
-          loadScript(url, options.after)
+          loadScript(url, after)
         }, options.timeout)
       }
-    } catch (e) {
+    } catch(err) {
       // 不支持localStorage或解析出错
       // 用户传入的after出错 －－ 暂不考虑
-      loadScript(url, options.after)
+      loadScript(url, after)
     }
   } else {
     // 不支持情况下使用script引入
-    loadScript(url, options.after)
+    loadScript(url, after)
   }
 }
 
@@ -137,7 +133,11 @@ function request(url, resolve, reject, timeout) {
   let xhr
   const method = 'GET'
   const onload = function () {
-    resolve(xhr.responseText || '')
+    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304 || xhr.status === 1223) {
+      resolve(xhr.responseText || '')
+    } else {
+      reject()
+    }
   }
 
   if (CORS) {
@@ -147,12 +147,32 @@ function request(url, resolve, reject, timeout) {
     xhr = new XDomainRequest()
     xhr.open(method, url)
   }
-  // xhr.withCredentials = true
 
-  xhr.timeout = timeout
-  xhr.onload = onload
-  xhr.onerror = reject
-  xhr.ontimeout = reject
+  // if ('withCredentials' in xhr) {
+  //   xhr.withCredentials = true
+  // }
+
+  if ('onload' in xhr) {
+    xhr.onload = onload
+  } else {
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        onload()
+      }
+    }
+  }
+
+  if ('onerror' in xhr) {
+    xhr.onerror = reject
+  }
+
+  try {
+    xhr.timeout = timeout  
+    xhr.ontimeout = reject
+  } catch(err) {
+    setTimeout(reject, timeout)
+  }
+  
   xhr.send()
 }
 

@@ -1,10 +1,10 @@
 {
   "name": "grey-publish",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "grey publish",
   "main": "build/grey.js",
   "scripts": {
-    "start": "BABEL_ENV=dev webpack-dashboard -- webpack-dev-server -w --open --env=dev",
+    "start": "BABEL_ENV=dev webpack-dev-server -w --open --env=dev",
     "build": "BABEL_ENV=prod webpack --env=prod",
     "test": "ava"
   },

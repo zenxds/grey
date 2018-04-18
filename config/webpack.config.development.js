@@ -1,9 +1,9 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const DashboardPlugin = require('webpack-dashboard/plugin')
 
 module.exports = {
+  mode: 'development',
   entry: './src/index.js',
   output: {
     path: path.join(__dirname, '../build'),
@@ -26,12 +26,8 @@ module.exports = {
       template: 'template/index.html',
       inject: 'head'
     }),
-    new DashboardPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('dev')
-    })
+    new webpack.DefinePlugin({})
   ],
   devServer: {
     contentBase: [
